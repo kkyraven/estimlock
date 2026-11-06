@@ -42,6 +42,7 @@ jobs:
         run: |
           $installer = Get-ChildItem target/release/bundle/nsis/*-setup.exe | Select-Object -First 1
           $hash = (Get-FileHash $installer.FullName -Algorithm SHA256).Hash.ToLower()
-          "$hash  $($installer.Name)" | Out-File -Encoding ascii SHA256SUMS.txt
+          # LF, because `sha256sum -c` reads a CR as part of the file name.
+          [IO.File]::WriteAllText("$PWD/SHA256SUMS.txt", "$hash  $($installer.Name)`n")
           gh release create $env:GITHUB_REF_NAME $installer.FullName SHA256SUMS.txt `
             --draft --verify-tag --generate-notes --title $env:GITHUB_REF_NAME
