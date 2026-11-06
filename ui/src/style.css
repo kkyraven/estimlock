@@ -1,0 +1,787 @@
+:root {
+  --steel: #17263f;
+  --plate: #1f3252;
+  --raise: #2d4670;
+  --line: #3b5a8a;
+  --ice: #e4eef8;
+  --mute: #9db4cf;
+  --dim: #6f8db3;
+  --rose: #e11d48;
+  --hot: #ff4d73;
+  --blush: #ff8fa8;
+  --quick: 120ms ease-out;
+
+  font-family: 'Saira Semi Condensed', Bahnschrift, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: var(--ice);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--steel);
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+button {
+  cursor: default;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 1px;
+}
+
+.icon {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* The font's widest digit, see setNumeric. */
+.digit {
+  display: inline-block;
+  width: 0.6em;
+  text-align: center;
+}
+
+/* Title bar */
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 0 6px 0 16px;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--mute);
+  pointer-events: none;
+}
+
+.bar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: var(--mute);
+  transition: background var(--quick), color var(--quick);
+}
+
+.bar-button:hover {
+  background: var(--plate);
+  color: var(--ice);
+}
+
+/* Back sits in the left padding, so the title only moves by what the arrow needs. */
+.bar-button:first-child {
+  margin-left: -12px;
+  margin-right: 2px;
+}
+
+/* Locked outline, over everything and never in the way. */
+
+.frame {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 2px var(--hot);
+  opacity: 0;
+  transition: opacity var(--quick);
+}
+
+[data-locked] .frame {
+  opacity: 1;
+}
+
+/* Main view */
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 16px;
+}
+
+.dial-area {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.dial {
+  display: block;
+  width: 300px;
+  height: 264px;
+}
+
+.dial path {
+  fill: var(--raise);
+}
+
+.dial .lit {
+  fill: var(--dim);
+}
+
+[data-on] .dial .lit {
+  fill: var(--ice);
+}
+
+.dial .hot {
+  fill: var(--hot);
+}
+
+.dial .owed {
+  fill: var(--dim);
+}
+
+.dial .dead {
+  fill: var(--plate);
+}
+
+.dial .stop {
+  fill: none;
+  stroke: var(--hot);
+  stroke-width: 3;
+}
+
+.dial .pawl {
+  fill: var(--ice);
+}
+
+.dial .pawl[hidden] {
+  display: none;
+}
+
+.readout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 8px;
+  pointer-events: none;
+}
+
+.number {
+  font-size: 76px;
+  font-weight: 300;
+  line-height: 80px;
+  color: var(--mute);
+}
+
+[data-on] .number {
+  color: var(--ice);
+}
+
+.status {
+  height: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  color: var(--mute);
+}
+
+[data-on] .status {
+  color: var(--ice);
+}
+
+.status[data-hot],
+.status.problem {
+  color: var(--blush);
+}
+
+.fix {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 4px 0 8px;
+  border-radius: 3px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--blush);
+  pointer-events: auto;
+  transition: background var(--quick);
+}
+
+.fix:hover {
+  background: var(--plate);
+}
+
+/* Buttons */
+
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  height: 44px;
+  border-radius: 4px;
+  background: var(--raise);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background var(--quick), color var(--quick), box-shadow var(--quick);
+}
+
+.key:hover:not(:disabled) {
+  background: var(--line);
+}
+
+.key:active:not(:disabled) {
+  background: var(--plate);
+}
+
+.key:disabled {
+  background: var(--plate);
+  color: var(--dim);
+}
+
+.key:disabled[data-cooling] {
+  color: var(--mute);
+}
+
+.key[data-active] {
+  box-shadow: inset 0 0 0 2px var(--ice);
+}
+
+.key.hot:not(:disabled) {
+  background: var(--rose);
+  color: #fff;
+}
+
+.key.hot:hover:not(:disabled) {
+  background: #f03a60;
+}
+
+.key.hot:active:not(:disabled) {
+  background: #be123c;
+}
+
+.key:disabled[data-active] {
+  color: var(--ice);
+  box-shadow: inset 0 0 0 2px var(--hot);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.unlocking {
+  display: grid;
+  grid-template-columns: 1fr 88px;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.countdown {
+  text-align: center;
+  font-weight: 600;
+  color: var(--blush);
+}
+
+.key.cancel {
+  background: var(--ice);
+  color: var(--steel);
+}
+
+.key.cancel:hover {
+  background: #fff;
+}
+
+.key.cancel:active {
+  background: var(--mute);
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* Switch */
+
+.switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 48px;
+  height: 26px;
+  padding: 3px;
+  border-radius: 4px;
+  background: var(--steel);
+  transition: background var(--quick);
+}
+
+.switch[aria-checked='true'] {
+  background: var(--line);
+}
+
+.switch:hover:not(:disabled) {
+  background: var(--raise);
+}
+
+.switch[aria-checked='true']:hover:not(:disabled) {
+  background: var(--dim);
+}
+
+.switch.wide,
+.switch.wide[aria-checked='true'] {
+  width: auto;
+  height: 44px;
+  background: var(--raise);
+}
+
+.switch.wide:hover:not(:disabled) {
+  background: var(--line);
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 2px;
+  background: var(--mute);
+  transition: transform var(--quick), background var(--quick);
+}
+
+.switch[aria-checked='true'] .knob {
+  transform: translateX(100%);
+  background: var(--ice);
+}
+
+.switch span {
+  position: relative;
+  text-align: center;
+  font-weight: 600;
+  color: var(--mute);
+  transition: color var(--quick);
+}
+
+.switch[aria-checked='false'] span:first-of-type,
+.switch[aria-checked='true'] span:last-of-type {
+  color: var(--steel);
+}
+
+.switch.wide:disabled {
+  background: var(--plate);
+}
+
+.switch:disabled .knob {
+  background: var(--line);
+}
+
+.switch:disabled span {
+  color: var(--dim);
+}
+
+.switch:disabled[aria-checked='false'] span:first-of-type,
+.switch:disabled[aria-checked='true'] span:last-of-type {
+  color: var(--ice);
+}
+
+/* Settings */
+
+.settings {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 34px;
+  padding: 0 8px;
+}
+
+.tabs button {
+  border-radius: 3px 3px 0 0;
+  font-weight: 500;
+  color: var(--mute);
+  transition: color var(--quick);
+}
+
+.tabs button:hover {
+  color: var(--ice);
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--plate);
+  color: var(--ice);
+  box-shadow: inset 0 2px 0 var(--ice);
+}
+
+.tabs button:focus-visible {
+  outline-offset: -2px;
+}
+
+.panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 12px;
+  background: var(--plate);
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px 1fr 96px;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  flex: none;
+}
+
+.switch-row {
+  grid-template-columns: 1fr auto;
+}
+
+.label {
+  color: var(--mute);
+}
+
+.row output {
+  text-align: right;
+  font-weight: 500;
+}
+
+.row output[data-hint] {
+  color: var(--mute);
+}
+
+/* Under the value, in the row's spare height, so showing it moves nothing. */
+.row-note {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: var(--blush);
+}
+
+.field {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.field-head {
+  display: flex;
+  justify-content: space-between;
+  height: 20px;
+  line-height: 20px;
+}
+
+.hint {
+  color: var(--mute);
+}
+
+.no-devices {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  padding-left: 12px;
+  border-radius: 4px;
+  background: var(--steel);
+  font-weight: 500;
+}
+
+.no-devices .key {
+  height: 34px;
+  padding: 0 16px;
+}
+
+select {
+  width: 100%;
+  height: 34px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: var(--steel);
+  font-weight: 500;
+}
+
+select:disabled {
+  color: var(--dim);
+  opacity: 1;
+}
+
+option {
+  background: var(--steel);
+  color: var(--ice);
+}
+
+/* Sliders: thumbs are 8px wide, so the fill runs between their centres. */
+
+.track {
+  position: relative;
+  height: 22px;
+  --lo: 0;
+  --hi: 0;
+}
+
+.track::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 10px;
+  height: 2px;
+  background: var(--line);
+}
+
+/* The run a capped slider cannot reach, with a stop in the dial's ceiling colour. */
+.track .past {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: calc(4px + var(--limit) * (100% - 8px));
+  right: 4px;
+  background: linear-gradient(to right, var(--hot) 2px, var(--steel) 2px);
+}
+
+.track .fill {
+  position: absolute;
+  top: 10px;
+  height: 2px;
+  left: calc(4px + var(--lo) * (100% - 8px));
+  right: calc(4px + (1 - var(--hi)) * (100% - 8px));
+  background: var(--ice);
+}
+
+.track input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  appearance: none;
+  background: transparent;
+}
+
+.track input::-webkit-slider-runnable-track {
+  height: 22px;
+  background: transparent;
+}
+
+.track input::-webkit-slider-thumb {
+  appearance: none;
+  width: 8px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 2px;
+  background: var(--ice);
+}
+
+.track input:focus-visible {
+  z-index: 1;
+  outline: none;
+}
+
+.track input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--ice);
+  outline-offset: 1px;
+}
+
+/* The track takes the pointer, see rangeSlider. Its height is the hit area. */
+.track.dual {
+  touch-action: none;
+}
+
+.track.dual input {
+  pointer-events: none;
+}
+
+/* Effects */
+
+.panel.effects {
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.effect-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+}
+
+.effect-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Hidden, not removed, so the wave pickers stay where they are. */
+.effect-sliders[data-none] {
+  visibility: hidden;
+}
+
+.effect-sliders .row {
+  grid-template-columns: auto 1fr 32px;
+  gap: 6px;
+  height: 28px;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, 40px);
+  padding: 2px;
+  border-radius: 4px;
+  background: var(--steel);
+}
+
+.segmented button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  border-radius: 3px;
+  color: var(--mute);
+  transition: background var(--quick), color var(--quick);
+}
+
+.segmented button .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.segmented button:hover {
+  color: var(--ice);
+}
+
+.segmented button[aria-checked='true'] {
+  background: var(--ice);
+  color: var(--steel);
+}
+
+/* Widget: the page stays clear, so the window's corners show what is behind it. */
+
+html:has(body.widget),
+body.widget {
+  background: transparent;
+}
+
+.widget-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+  padding: 6px 8px 8px;
+  border-radius: 10px;
+  background: var(--steel);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: box-shadow var(--quick);
+}
+
+[data-locked] .widget-bar {
+  box-shadow: inset 0 0 0 2px var(--hot);
+}
+
+.widget-top {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.widget-top span {
+  pointer-events: none;
+}
+
+.widget-level {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--mute);
+}
+
+[data-on] .widget-level {
+  color: var(--ice);
+}
+
+.widget-state {
+  color: var(--mute);
+}
+
+.widget-state[data-hot] {
+  color: var(--blush);
+}
+
+/* Ramp never counts down, so it gives its width to the keys that do. */
+.widget-keys {
+  flex: none;
+  display: grid;
+  grid-template-columns: 52px 1fr 1fr;
+  gap: 4px;
+}
+
+.widget-keys .key {
+  height: 36px;
+  font-size: 13px;
+}

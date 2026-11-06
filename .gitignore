@@ -1,0 +1,6 @@
+target/
+node_modules/
+dist/
+mocks/
+recordings/
+src-tauri/gen/
